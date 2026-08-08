@@ -18,6 +18,7 @@ const config: Config = {
         "border-strong": "hsl(var(--border-strong))",
         ring: "hsl(var(--ring))",
         bg: "hsl(var(--bg))",
+        "sidebar-bg": "hsl(var(--sidebar-bg))",
         surface: "hsl(var(--surface))",
         "surface-elevated": "hsl(var(--surface-elevated))",
         "surface-hover": "hsl(var(--surface-hover))",

@@ -32,7 +32,7 @@ export function MissionControl() {
           <CardTitle>Mission Control</CardTitle>
           <CardDescription>Today&rsquo;s revenue target, and where every horizon stands.</CardDescription>
         </div>
-        <Badge variant="accent">Live</Badge>
+        <Badge variant="outline">Live</Badge>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
         <div className="flex flex-col gap-4 rounded-md border border-border bg-bg/40 p-4">

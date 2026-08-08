@@ -62,30 +62,40 @@ All three are clean on this codebase as delivered.
 src/
   app/
     (auth)/               Public route group — /login, server actions for sign-in/sign-out
-    (app)/                 Protected route group — sidebar + header shell, all 20 modules
+    (app)/                 Protected route group — sidebar + header shell, all modules
       command-center/      The only fully-built dashboard in this phase
       settings/             Profile, Appearance, Notifications, Data & Backup
-      <18 reserved routes>  Each renders <ReservedModulePage> until its own build phase
+      business/ life/ money/ growth/ journal/   Expandable parents — index page is a
+                             <ModuleHubPage>, each child folder a <ReservedModulePage>
+      vision/ ideas/ coach/ timeline/            Standalone leaves — <ReservedModulePage>
     layout.tsx              Root layout — fonts, theme provider, tooltip provider
     globals.css              Design tokens (light + dark), scrollbars, focus rings, motion
   components/
     ui/                     Reusable primitives: button, card, input, dialog, dropdown, etc.
     layout/                  Sidebar, header, mobile nav, theme toggle, user menu
-    dashboard/                Mission Control, priority list, stat card, reserved-module placeholder
+    dashboard/                Mission Control, priority list, stat card, module-hub, reserved-module
     providers/                Theme + tooltip providers
   lib/
-    navigation.ts            Single source of truth for the sidebar — add a module here first
+    navigation.ts            Single source of truth for the sidebar — a tree of groups → items →
+                              optional children. Add a module here first; everything else follows.
     supabase/                 Browser client, server client, middleware session refresh
     utils.ts                   cn(), formatCurrency(), getInitials()
   middleware.ts               Auth gate — redirects signed-out visitors to /login
-  types/index.ts              Shared TypeScript types
+  types/index.ts               Shared TypeScript types
 ```
+
+### Navigation hierarchy
+
+The sidebar is condensed into ~11 top-level entries across 7 groups (Overview, Direction, Business, Capital, Growth, Journal, AI), with five of them — **Life, Business, Money, Growth, Journal** — expandable via progressive disclosure instead of exposing every module flat. Expanding a parent reveals its children inline with a smooth height transition; collapsing the sidebar to icon-only mode turns each parent back into a direct link to its hub page. Expand/collapse state persists in `localStorage` and the active branch auto-expands on deep links.
+
+Old flat URLs from the previous structure (e.g. `/vision-goals`, `/business-portfolio`) still resolve via permanent redirects defined in `next.config.mjs`, so nothing bookmarked breaks.
 
 ## Design system
 
-Monochrome by design — black, white, and a ladder of neutral greys, with a single muted blue accent (`--accent`) reserved for focus states, active states, and the one "Live" badge on Mission Control. No gradients, no glassmorphism, no bright colors elsewhere.
+A sophisticated **layered neutral palette** — off-white → soft grey → medium grey → charcoal → near-black — rather than stark black/white. The sidebar (`--sidebar-bg`) sits one tone apart from the main content area (`--bg`) for quiet visual separation, and cards (`--surface`) sit a touch lighter still. A single muted blue accent (`--accent`) exists only for focus rings — active navigation states use a soft grey surface, never color.
 
 All color, radius, and shadow values are CSS custom properties defined once in `globals.css` and consumed through `tailwind.config.ts` — change a value there and it updates everywhere, in both themes, automatically.
+
 
 - **Radius**: 8–20px scale (`rounded-sm` through `rounded-2xl`)
 - **Type**: Inter for UI text, JetBrains Mono for numbers and data (revenue figures, stats)

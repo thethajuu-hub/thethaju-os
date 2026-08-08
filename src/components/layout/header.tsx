@@ -5,12 +5,12 @@ import { Search } from "lucide-react";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { UserMenu } from "@/components/layout/user-menu";
-import { NAV_MODULES, SETTINGS_MODULE } from "@/lib/navigation";
+import { NAV_FLAT, SETTINGS_ITEM } from "@/lib/navigation";
 import type { FounderProfile } from "@/types";
 
 function useCurrentModuleLabel() {
   const pathname = usePathname();
-  const all = [...NAV_MODULES, SETTINGS_MODULE];
+  const all = [...NAV_FLAT, SETTINGS_ITEM];
   const match = all
     .filter((m) => pathname.startsWith(m.href))
     .sort((a, b) => b.href.length - a.href.length)[0];
