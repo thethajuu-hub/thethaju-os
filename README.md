@@ -36,7 +36,17 @@ cp .env.example .env.local
 3. This is a **single-admin-account** system — there's no sign-up page by design. Create your one account directly in Supabase: **Authentication → Users → Add user**, and set an email + password there.
 4. Without these two variables set, the app still runs — the auth gate is bypassed and a local placeholder profile is used, so you can keep building the UI without a Supabase project. The moment both variables are present, `/login` and the middleware auth gate activate for real.
 
-### 2. Run it
+### 2. Run the database migration (Stage 2 — Command Center)
+
+Command Center's tasks and Mission Control are backed by real Supabase tables. Run the migration once:
+
+1. Open your Supabase project → **SQL Editor → New query**
+2. Paste the full contents of `supabase/migrations/0001_command_center.sql`
+3. Run it
+
+This creates three tables — `tasks`, `revenue_targets`, `revenue_entries` — all with row-level security scoped to your own user. `revenue_entries` has a `source` column (`agency` / `dropshipping` / `other`) on purpose: when the Agency and Dropshipping modules ship in a later phase, they'll insert into this same table and Mission Control's totals update automatically — no changes needed there.
+
+### 3. Run it locally
 
 ```bash
 npm run dev
@@ -44,7 +54,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) — you'll land on `/command-center` (or `/login` if Supabase is configured and you're signed out).
 
-### 3. Verify before you ship
+### 4. Verify before you ship
 
 ```bash
 npm run typecheck   # tsc --noEmit

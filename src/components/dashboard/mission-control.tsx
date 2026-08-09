@@ -1,83 +1,247 @@
+"use client";
+
+import * as React from "react";
+import { useFormStatus } from "react-dom";
+import { Pencil, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { formatCurrency, cn } from "@/lib/utils";
-import type { RevenueTarget } from "@/types";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { formatCurrency } from "@/lib/utils";
+import { upsertTargets, addRevenueEntry } from "@/app/(app)/command-center/actions";
+import type { RevenueTargets, RevenueAchieved } from "@/types";
+import type { RevenueBySource } from "@/lib/supabase/queries";
 
-const DAILY_TARGETS: RevenueTarget[] = [
-  { label: "Agency", target: 2000, current: 0 },
-  { label: "Dropshipping", target: 1000, current: 0 },
+const PERIODS: { key: keyof RevenueTargets; label: string }[] = [
+  { key: "week", label: "This week" },
+  { key: "month", label: "This month" },
+  { key: "year", label: "This year" },
 ];
 
-const HORIZON_TARGETS: { label: string; target: RevenueTarget }[] = [
-  { label: "This week", target: { label: "Weekly", target: 21000, current: 0 } },
-  { label: "This month", target: { label: "Monthly", target: 90000, current: 0 } },
-  { label: "This year", target: { label: "Yearly", target: 1080000, current: 0 } },
+const SOURCE_LABELS: { key: keyof RevenueBySource; label: string }[] = [
+  { key: "agency", label: "Agency" },
+  { key: "dropshipping", label: "Dropshipping" },
+  { key: "other", label: "Other" },
 ];
 
-/**
- * Mission Control shows the founder's targets at every horizon. Figures are
- * wired to zero on purpose — this is the foundation phase, before Business
- * Portfolio and Personal Finance exist to feed it real numbers.
- */
-export function MissionControl() {
-  const totalTarget = DAILY_TARGETS.reduce((sum, t) => sum + t.target, 0);
-  const totalCurrent = DAILY_TARGETS.reduce((sum, t) => sum + t.current, 0);
-  const remaining = totalTarget - totalCurrent;
+export function MissionControl({
+  targets,
+  achieved,
+  bySource,
+}: {
+  targets: RevenueTargets;
+  achieved: RevenueAchieved;
+  bySource: RevenueBySource;
+}) {
+  const [editOpen, setEditOpen] = React.useState(false);
+  const [addOpen, setAddOpen] = React.useState(false);
+  const hasAnySource = bySource.agency > 0 || bySource.dropshipping > 0 || bySource.other > 0;
 
   return (
     <Card>
       <CardHeader className="flex-row items-start justify-between space-y-0">
         <div className="flex flex-col gap-1">
           <CardTitle>Mission Control</CardTitle>
-          <CardDescription>Today&rsquo;s revenue target, and where every horizon stands.</CardDescription>
+          <CardDescription>Where every horizon stands, pulled straight from your revenue log.</CardDescription>
         </div>
-        <Badge variant="outline">Live</Badge>
+        <div className="flex items-center gap-1.5">
+          <Button variant="secondary" size="sm" onClick={() => setAddOpen(true)}>
+            <Plus className="h-3.5 w-3.5" />
+            Add revenue
+          </Button>
+          <Button variant="ghost" size="icon" aria-label="Edit targets" onClick={() => setEditOpen(true)}>
+            <Pencil className="h-3.5 w-3.5" />
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
-        <div className="flex flex-col gap-4 rounded-md border border-border bg-bg/40 p-4">
-          <div className="flex items-baseline justify-between">
-            <span className="text-[12.5px] text-foreground-muted">Today&rsquo;s total target</span>
-            <span className="font-mono text-[13px] text-foreground-subtle">
-              {formatCurrency(totalCurrent)} / {formatCurrency(totalTarget)}
-            </span>
-          </div>
-          <Progress value={(totalCurrent / totalTarget) * 100} />
-          <p className="text-[12px] text-foreground-subtle">
-            {formatCurrency(remaining)} remaining today
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {DAILY_TARGETS.map((t) => (
-            <div key={t.label} className="flex flex-col gap-2 rounded-md border border-border p-3.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[12.5px] font-medium text-foreground">{t.label}</span>
-                <span className="font-mono text-[12px] text-foreground-subtle">
-                  {formatCurrency(t.current)} / {formatCurrency(t.target)}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {PERIODS.map(({ key, label }) => {
+            const target = targets[key];
+            const current = achieved[key];
+            const pct = target > 0 ? Math.min(100, (current / target) * 100) : 0;
+            return (
+              <div key={key} className="flex flex-col gap-2.5 rounded-md border border-border p-3.5">
+                <span className="text-[11.5px] uppercase tracking-wide text-foreground-subtle">
+                  {label}
                 </span>
+                <span className="font-mono text-[17px] font-medium text-foreground">
+                  {formatCurrency(current)}
+                </span>
+                {target > 0 ? (
+                  <>
+                    <Progress value={pct} />
+                    <span className="text-[11.5px] text-foreground-subtle">
+                      {pct.toFixed(0)}% of {formatCurrency(target)}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-[11.5px] text-foreground-subtle">
+                    No target set — click Edit to add one
+                  </span>
+                )}
               </div>
-              <Progress value={(t.current / t.target) * 100} barClassName="bg-accent" />
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        <div className="grid grid-cols-1 gap-3 border-t border-border pt-5 sm:grid-cols-3">
-          {HORIZON_TARGETS.map(({ label, target }) => (
-            <div key={label} className="flex flex-col gap-1.5">
-              <span className="text-[11.5px] uppercase tracking-wide text-foreground-subtle">
-                {label}
-              </span>
-              <span className="font-mono text-[15px] font-medium text-foreground">
-                {formatCurrency(target.current)}
-              </span>
-              <span className="text-[11.5px] text-foreground-subtle">
-                of {formatCurrency(target.target)} goal
-              </span>
+        {hasAnySource && (
+          <div className="border-t border-border pt-5">
+            <p className="mb-3 text-[12px] font-medium text-foreground-subtle">This month by source</p>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {SOURCE_LABELS.map(({ key, label }) => (
+                <div key={key} className="flex items-center justify-between rounded-md border border-border px-3.5 py-2.5">
+                  <span className="text-[12.5px] text-foreground-muted">{label}</span>
+                  <span className="font-mono text-[13px] text-foreground">
+                    {formatCurrency(bySource[key])}
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        )}
       </CardContent>
+
+      <EditTargetsDialog open={editOpen} onOpenChange={setEditOpen} targets={targets} />
+      <AddRevenueDialog open={addOpen} onOpenChange={setAddOpen} />
     </Card>
+  );
+}
+
+function EditTargetsDialog({
+  open,
+  onOpenChange,
+  targets,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  targets: RevenueTargets;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <form
+          action={async (formData) => {
+            await upsertTargets(formData);
+            onOpenChange(false);
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle>Edit revenue targets</DialogTitle>
+            <DialogDescription>What you&rsquo;re aiming for at each horizon.</DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-4">
+            {PERIODS.map(({ key, label }) => (
+              <div key={key} className="flex flex-col gap-1.5">
+                <Label htmlFor={`target-${key}`}>{label} target</Label>
+                <Input
+                  id={`target-${key}`}
+                  name={key}
+                  type="number"
+                  min="0"
+                  step="1"
+                  defaultValue={targets[key] || ""}
+                  placeholder="0"
+                />
+              </div>
+            ))}
+          </div>
+
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary" size="sm">
+                Cancel
+              </Button>
+            </DialogClose>
+            <SubmitButton label="Save targets" />
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function AddRevenueDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const formRef = React.useRef<HTMLFormElement>(null);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <form
+          ref={formRef}
+          action={async (formData) => {
+            await addRevenueEntry(formData);
+            formRef.current?.reset();
+            onOpenChange(false);
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle>Add revenue</DialogTitle>
+            <DialogDescription>
+              Log a manual entry now — Agency and Dropshipping will post here automatically once those modules ship.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="amount">Amount</Label>
+              <Input id="amount" name="amount" type="number" min="0" step="0.01" placeholder="0.00" required />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="source">Source</Label>
+              <select
+                id="source"
+                name="source"
+                defaultValue="other"
+                className="flex h-10 w-full rounded-md border border-border bg-surface px-3.5 text-[13.5px] text-foreground outline-none transition-colors focus:border-border-strong focus:ring-2 focus:ring-accent/30"
+              >
+                <option value="agency">Agency</option>
+                <option value="dropshipping">Dropshipping</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="note">Note (optional)</Label>
+              <Input id="note" name="note" placeholder="e.g. Client invoice #204" />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary" size="sm">
+                Cancel
+              </Button>
+            </DialogClose>
+            <SubmitButton label="Add revenue" />
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function SubmitButton({ label }: { label: string }) {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" size="sm" loading={pending}>
+      {label}
+    </Button>
   );
 }
