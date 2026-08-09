@@ -126,10 +126,10 @@ function TaskRow({
         <span
           className={cn(
             "flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded-[5px] border transition-colors",
-            task.done ? "border-foreground bg-foreground" : "border-border-strong"
+            task.done ? "border-accent bg-accent" : "border-border-strong"
           )}
         >
-          {task.done && <Check className="h-3 w-3 text-bg" strokeWidth={3} />}
+          {task.done && <Check className="h-3 w-3 text-accent-foreground" strokeWidth={3} />}
         </span>
       </button>
 

@@ -18,7 +18,7 @@ function Progress({ value, className, barClassName }: ProgressProps) {
       className={cn("h-1.5 w-full overflow-hidden rounded-full bg-surface-hover", className)}
     >
       <div
-        className={cn("h-full rounded-full bg-foreground transition-[width] duration-500 ease-out", barClassName)}
+        className={cn("h-full rounded-full bg-accent transition-[width] duration-500 ease-out", barClassName)}
         style={{ width: `${clamped}%` }}
       />
     </div>

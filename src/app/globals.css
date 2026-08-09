@@ -4,28 +4,30 @@
 
 @layer base {
   :root {
-    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
     /* Layered neutral ladder — off-white, through soft/medium greys, to charcoal.
-       Each surface reads as a distinct tonal step rather than a hard line. */
-    --bg: 40 20% 98.5%;              /* main content — soft off-white, not pure white */
-    --sidebar-bg: 40 12% 96.3%;      /* one shade down — separates the shell from content */
+       Midnight blue is the signature identity colour: used for primary actions,
+       active states, and important metrics — never as a background wash. */
+    --bg: 60 9% 96%;                  /* main content — soft off-white, not pure white */
+    --sidebar-bg: 60 6% 93%;          /* one shade down — separates the shell from content */
     --surface: 0 0% 100%;             /* cards sit slightly lighter than bg, a gentle "lift" */
-    --surface-elevated: 0 0% 100%;
-    --surface-hover: 240 8% 93.5%;
-    --border: 240 8% 89%;
-    --border-strong: 240 7% 79%;
-    --foreground: 230 16% 15%;        /* charcoal, never pure black */
-    --foreground-muted: 230 7% 42%;
-    --foreground-subtle: 230 6% 60%;
-    --accent: 224 64% 55%;            /* used only for focus rings — not active nav states */
-    --accent-muted: 224 64% 55%;
+    --surface-elevated: 60 9% 98%;
+    --surface-hover: 60 5% 88%;
+    --border: 60 5% 85%;
+    --border-strong: 60 4% 82%;
+    --foreground: 0 0% 9%;            /* charcoal, never pure black */
+    --foreground-muted: 0 0% 32%;
+    --foreground-subtle: 0 0% 45%;
+    --accent: 214 68% 14%;            /* midnight blue — primary actions, active states, identity */
+    --accent-muted: 214 68% 14%;
+    --accent-hover: 214 65% 18%;
     --accent-foreground: 0 0% 100%;
-    --ring: 224 64% 55%;
-    --success: 152 42% 33%;
-    --warning: 38 74% 40%;
-    --danger: 358 62% 47%;
+    --ring: 214 68% 14%;
+    --success: 148 70% 31%;
+    --warning: 38 100% 33%;
+    --danger: 0 56% 50%;
   }
 
   .dark {
@@ -39,10 +41,11 @@
     --foreground: 40 8% 93%;          /* soft off-white, never pure white */
     --foreground-muted: 230 4% 64%;
     --foreground-subtle: 230 4% 44%;
-    --accent: 224 70% 65%;
-    --accent-muted: 224 70% 65%;
-    --accent-foreground: 230 9% 7.5%;
-    --ring: 224 70% 65%;
+    --accent: 214 100% 54%;
+    --accent-muted: 214 100% 54%;
+    --accent-hover: 214 100% 60%;
+    --accent-foreground: 0 0% 100%;
+    --ring: 214 100% 54%;
     --success: 152 36% 50%;
     --warning: 38 65% 56%;
     --danger: 358 56% 60%;

@@ -67,7 +67,7 @@ export function Sidebar() {
       )}
     >
       <div className="flex h-14 items-center gap-2.5 border-b border-border px-4">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-foreground text-[11.5px] font-semibold text-bg">
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-accent text-[11.5px] font-semibold text-accent-foreground">
           T
         </div>
         {!collapsed && (
@@ -114,7 +114,7 @@ export function Sidebar() {
         />
         <button
           onClick={toggleCollapsed}
-          className="mt-1 flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-[12.5px] text-foreground-subtle transition-colors hover:bg-surface-hover hover:text-foreground-muted"
+          className="mt-1 flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-[12.5px] text-foreground-subtle transition-colors hover:bg-surface-hover hover:text-foreground-muted"
         >
           {collapsed ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />}
           {!collapsed && "Collapse"}
@@ -171,8 +171,8 @@ function NavNode({
     <div>
       <div
         className={cn(
-          "group flex items-center rounded-md pr-1 transition-colors",
-          selfActive || descendantActive ? "bg-surface-hover" : "hover:bg-surface-hover"
+          "group flex items-center rounded-xl pr-1 transition-colors",
+          selfActive || descendantActive ? "bg-accent-muted/8" : "hover:bg-surface-hover"
         )}
       >
         <Link
@@ -249,11 +249,11 @@ function SimpleLink({
     <Link
       href={href}
       className={cn(
-        "group flex items-center gap-2.5 rounded-md text-[13px] transition-colors",
+        "group flex items-center gap-2.5 rounded-xl text-[13px] transition-colors",
         compact ? "px-2.5 py-[6px] text-[12.5px]" : "px-2.5 py-[7px]",
         collapsed && "justify-center px-0",
         active
-          ? "bg-surface-hover font-medium text-foreground"
+          ? "bg-accent text-accent-foreground font-semibold shadow-subtle"
           : "text-foreground-muted hover:bg-surface-hover hover:text-foreground"
       )}
     >
@@ -261,7 +261,7 @@ function SimpleLink({
         className={cn(
           compact ? "h-3.5 w-3.5" : "h-[15px] w-[15px]",
           "shrink-0",
-          active ? "text-foreground" : "text-foreground-subtle group-hover:text-foreground-muted"
+          active ? "text-accent-foreground" : "text-foreground-subtle group-hover:text-foreground-muted"
         )}
         strokeWidth={1.75}
       />

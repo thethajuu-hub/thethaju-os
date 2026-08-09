@@ -16,7 +16,7 @@ export default function LoginPage() {
   return (
     <div className="flex flex-col gap-8 animate-fade-in-up">
       <div className="flex flex-col items-center gap-3 text-center">
-        <div className="flex h-9 w-9 items-center justify-center rounded-md bg-foreground text-[14px] font-semibold text-bg">
+        <div className="flex h-9 w-9 items-center justify-center rounded-md bg-accent text-[14px] font-semibold text-accent-foreground">
           T
         </div>
         <div className="flex flex-col gap-1">

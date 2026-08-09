@@ -29,7 +29,7 @@ export function Header({ profile }: { profile: FounderProfile }) {
 
       <div className="flex items-center gap-1.5">
         <button
-          className="hidden items-center gap-2 rounded-md border border-border bg-surface px-3 py-1.5 text-[12.5px] text-foreground-subtle transition-colors hover:border-border-strong hover:text-foreground-muted sm:flex"
+          className="hidden items-center gap-2 rounded-xl border border-border bg-surface px-3 py-1.5 text-[12.5px] text-foreground-subtle transition-colors hover:border-border-strong hover:text-foreground-muted sm:flex"
           aria-label="Search"
         >
           <Search className="h-3.5 w-3.5" />
