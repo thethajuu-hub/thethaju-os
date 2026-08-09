@@ -1,6 +1,15 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { startOfWeekISO, startOfMonthISO, startOfYearISO } from "@/lib/dates";
-import type { Task, Timeframe, RevenueTargets, RevenueAchieved } from "@/types";
+import type {
+  Task,
+  Timeframe,
+  RevenueTargets,
+  RevenueAchieved,
+  VisionCategory,
+  VisionEntry,
+  GoalTimeframe,
+  Goal,
+} from "@/types";
 
 interface TaskRow {
   id: string;
@@ -123,4 +132,83 @@ export async function getRevenueBySourceThisMonth(supabase: SupabaseClient): Pro
     if (key in totals) totals[key] += Number(row.amount);
   }
   return totals;
+}
+
+// ============================================================
+// VISION & GOALS — Stage 3
+// ============================================================
+
+const VISION_CATEGORIES: VisionCategory[] = [
+  "life_vision",
+  "mission",
+  "core_values",
+  "dream_life",
+  "long_term_vision",
+];
+
+export async function getVisionEntries(
+  supabase: SupabaseClient
+): Promise<Record<VisionCategory, VisionEntry>> {
+  const { data, error } = await supabase
+    .from("vision_entries")
+    .select("category, content, updated_at");
+
+  const result = VISION_CATEGORIES.reduce((acc, category) => {
+    acc[category] = { category, content: "", updatedAt: null };
+    return acc;
+  }, {} as Record<VisionCategory, VisionEntry>);
+
+  if (error) {
+    console.error("getVisionEntries failed:", error.message);
+    return result;
+  }
+  for (const row of data ?? []) {
+    const category = row.category as VisionCategory;
+    result[category] = { category, content: row.content, updatedAt: row.updated_at };
+  }
+  return result;
+}
+
+interface GoalRow {
+  id: string;
+  title: string;
+  timeframe: GoalTimeframe;
+  done: boolean;
+  sort_order: number;
+  created_at: string;
+}
+
+function mapGoal(row: GoalRow): Goal {
+  return {
+    id: row.id,
+    title: row.title,
+    timeframe: row.timeframe,
+    done: row.done,
+    sortOrder: row.sort_order,
+    createdAt: row.created_at,
+  };
+}
+
+const GOAL_TIMEFRAMES: GoalTimeframe[] = ["10yr", "5yr", "3yr", "1yr", "quarter", "month", "week"];
+
+export async function getAllGoals(supabase: SupabaseClient): Promise<Record<GoalTimeframe, Goal[]>> {
+  const { data, error } = await supabase
+    .from("goals")
+    .select("id, title, timeframe, done, sort_order, created_at")
+    .order("done", { ascending: true })
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true });
+
+  const empty = GOAL_TIMEFRAMES.reduce((acc, t) => {
+    acc[t] = [];
+    return acc;
+  }, {} as Record<GoalTimeframe, Goal[]>);
+  if (error) {
+    console.error("getAllGoals failed:", error.message);
+    return empty;
+  }
+  for (const row of (data ?? []) as GoalRow[]) {
+    empty[row.timeframe].push(mapGoal(row));
+  }
+  return empty;
 }

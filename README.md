@@ -46,7 +46,17 @@ Command Center's tasks and Mission Control are backed by real Supabase tables. R
 
 This creates three tables — `tasks`, `revenue_targets`, `revenue_entries` — all with row-level security scoped to your own user. `revenue_entries` has a `source` column (`agency` / `dropshipping` / `other`) on purpose: when the Agency and Dropshipping modules ship in a later phase, they'll insert into this same table and Mission Control's totals update automatically — no changes needed there.
 
-### 3. Run it locally
+### 3. Run the Stage 3 migration (Vision & Goals)
+
+Same process, next file:
+
+1. Supabase → **SQL Editor → New query**
+2. Paste the full contents of `supabase/migrations/0002_vision.sql`
+3. Run it
+
+Adds `vision_entries` (your five vision statements — Life Vision, Mission, Core Values, Dream Life, Long-Term Vision) and `goals` (the ladder from 10-year down to this week). "Today" already lives in Tasks and "this year" in Mission Control's revenue target, so Goals only covers the rungs in between — no duplication.
+
+### 4. Run it locally
 
 ```bash
 npm run dev
@@ -54,7 +64,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) — you'll land on `/command-center` (or `/login` if Supabase is configured and you're signed out).
 
-### 4. Verify before you ship
+### 5. Verify before you ship
 
 ```bash
 npm run typecheck   # tsc --noEmit

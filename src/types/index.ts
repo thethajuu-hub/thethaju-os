@@ -46,3 +46,22 @@ export interface RevenueEntry {
 }
 
 export type ThemeMode = "light" | "dark" | "system";
+
+export type VisionCategory = "life_vision" | "mission" | "core_values" | "dream_life" | "long_term_vision";
+
+export interface VisionEntry {
+  category: VisionCategory;
+  content: string;
+  updatedAt: string | null;
+}
+
+export type GoalTimeframe = "10yr" | "5yr" | "3yr" | "1yr" | "quarter" | "month" | "week";
+
+export interface Goal {
+  id: string;
+  title: string;
+  timeframe: GoalTimeframe;
+  done: boolean;
+  sortOrder: number;
+  createdAt: string;
+}
