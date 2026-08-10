@@ -12,14 +12,20 @@ interface StatCardProps {
 }
 
 export function StatCard({ label, value, hint, icon: Icon, trend, className }: StatCardProps) {
+  const [primaryValue, ...unitParts] = value.split(" ");
+  const unit = unitParts.join(" ");
+
   return (
     <Card className={cn("p-5", className)}>
-      <div className="flex items-start justify-between">
-        <p className="text-[12.5px] text-foreground-muted">{label}</p>
-        <Icon className="h-4 w-4 text-foreground-subtle" strokeWidth={1.75} />
+      <div className="mb-5 flex items-center justify-between">
+        <span className="text-[12px] font-bold text-foreground-muted">{label}</span>
+        <div className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[10px] bg-surface-elevated">
+          <Icon className="h-4 w-4 text-foreground-muted" strokeWidth={1.75} />
+        </div>
       </div>
-      <p className="mt-2.5 font-mono text-[24px] font-medium tracking-tight text-foreground">
-        {value}
+      <p className="text-[26px] font-bold tracking-tight text-accent">
+        {primaryValue}
+        {unit && <span className="ml-1 text-[14px] font-semibold text-foreground-subtle">{unit}</span>}
       </p>
       {(hint || trend) && (
         <div className="mt-1.5 flex items-center gap-1.5 text-[12px]">

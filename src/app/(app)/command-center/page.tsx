@@ -9,6 +9,7 @@ import {
 import { greetingForHour } from "@/lib/dates";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { MissionControl } from "@/components/dashboard/mission-control";
+import { YearProgress } from "@/components/dashboard/year-progress";
 import { PriorityList } from "@/components/dashboard/priority-list";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -46,11 +47,14 @@ export default async function CommandCenterPage() {
         </div>
       )}
 
-      <MissionControl
-        targets={data?.targets ?? { week: 0, month: 0, year: 0 }}
-        achieved={data?.achieved ?? { week: 0, month: 0, year: 0 }}
-        bySource={data?.bySource ?? { agency: 0, dropshipping: 0, other: 0 }}
-      />
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.55fr_1fr]">
+        <MissionControl
+          targets={data?.targets ?? { week: 0, month: 0, year: 0 }}
+          achieved={data?.achieved ?? { week: 0, month: 0, year: 0 }}
+          bySource={data?.bySource ?? { agency: 0, dropshipping: 0, other: 0 }}
+        />
+        <YearProgress target={data?.targets.year ?? 0} achieved={data?.achieved.year ?? 0} />
+      </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <PriorityList title="Today" timeframe="today" tasks={data?.tasks.today ?? []} />

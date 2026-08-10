@@ -8,12 +8,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const profile = await getFounderProfile();
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-bg">
+    <div className="flex h-screen w-full gap-4 overflow-hidden bg-bg p-4 md:gap-5 md:p-5">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Header profile={profile} />
         <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-[1200px] px-4 py-6 md:px-8 md:py-8">{children}</div>
+          <div className="mx-auto w-full max-w-[1200px] py-2">{children}</div>
         </main>
       </div>
     </div>

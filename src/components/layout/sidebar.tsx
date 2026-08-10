@@ -62,33 +62,33 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "hidden md:flex md:flex-col shrink-0 border-r border-border bg-sidebar-bg transition-[width] duration-200 ease-out",
-        collapsed ? "md:w-[64px]" : "md:w-[236px]"
+        "hidden md:flex md:flex-col shrink-0 rounded-2xl bg-surface p-3 shadow-elevated transition-[width] duration-200 ease-out",
+        collapsed ? "md:w-[76px]" : "md:w-[264px]"
       )}
     >
-      <div className="flex h-14 items-center gap-2.5 border-b border-border px-4">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-accent text-[11.5px] font-semibold text-accent-foreground">
+      <div className="flex items-center gap-2.5 px-2 pb-[22px] pt-0.5">
+        <div className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[11px] bg-accent text-[15px] font-bold text-accent-foreground">
           T
         </div>
         {!collapsed && (
           <div className="flex flex-col leading-none">
-            <span className="text-[12.5px] font-medium tracking-tight text-foreground">
+            <span className="text-[15.5px] font-bold tracking-tight text-foreground">
               Founder OS
             </span>
-            <span className="text-[10.5px] text-foreground-subtle">Private workspace</span>
+            <span className="mt-[1px] text-[11px] text-foreground-subtle">Private workspace</span>
           </div>
         )}
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-2.5 py-4">
+      <nav className="flex-1 overflow-y-auto px-1">
         {NAV_TREE.map((group) => (
-          <div key={group.name} className="mb-5 last:mb-0">
+          <div key={group.name} className="mb-3.5 last:mb-0">
             {!collapsed && (
-              <p className="mb-1.5 px-2 text-[10.5px] font-medium uppercase tracking-wider text-foreground-subtle/80">
+              <p className="mb-1.5 px-2.5 text-[10.5px] font-bold uppercase tracking-wider text-foreground-subtle">
                 {group.name}
               </p>
             )}
-            <div className="flex flex-col gap-0.5">
+            <div className="flex flex-col gap-[3px]">
               {group.items.map((item) => (
                 <NavNode
                   key={item.href}
@@ -104,7 +104,7 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <div className="border-t border-border px-2.5 py-3">
+      <div className="px-1 pt-3">
         <SimpleLink
           href={SETTINGS_ITEM.href}
           label={SETTINGS_ITEM.label}
@@ -114,7 +114,7 @@ export function Sidebar() {
         />
         <button
           onClick={toggleCollapsed}
-          className="mt-1 flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-[12.5px] text-foreground-subtle transition-colors hover:bg-surface-hover hover:text-foreground-muted"
+          className="mt-1 flex w-full items-center gap-2.5 rounded-[13px] px-2.5 py-2 text-[12.5px] text-foreground-subtle transition-colors hover:bg-surface-hover hover:text-foreground-muted"
         >
           {collapsed ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />}
           {!collapsed && "Collapse"}
@@ -171,14 +171,14 @@ function NavNode({
     <div>
       <div
         className={cn(
-          "group flex items-center rounded-xl pr-1 transition-colors",
+          "group flex items-center rounded-[13px] pr-1 transition-colors",
           selfActive || descendantActive ? "bg-accent-muted/8" : "hover:bg-surface-hover"
         )}
       >
         <Link
           href={item.href}
           className={cn(
-            "flex flex-1 items-center gap-2.5 px-2.5 py-[7px] text-[13px]",
+            "flex flex-1 items-center gap-2.5 px-2.5 py-[6px] text-[13px]",
             selfActive || descendantActive
               ? "font-medium text-foreground"
               : "text-foreground-muted group-hover:text-foreground"
@@ -249,8 +249,8 @@ function SimpleLink({
     <Link
       href={href}
       className={cn(
-        "group flex items-center gap-2.5 rounded-xl text-[13px] transition-colors",
-        compact ? "px-2.5 py-[6px] text-[12.5px]" : "px-2.5 py-[7px]",
+        "group flex items-center gap-2.5 rounded-[13px] text-[13px] transition-colors",
+        compact ? "px-2.5 py-[5px] text-[12.5px]" : "px-2.5 py-[6px]",
         collapsed && "justify-center px-0",
         active
           ? "bg-accent text-accent-foreground font-semibold shadow-subtle"
