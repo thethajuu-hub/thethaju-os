@@ -62,6 +62,66 @@ export async function createGoal(formData: FormData) {
   revalidatePath("/vision");
 }
 
+export async function saveGoal(formData: FormData) {
+  const supabase = requireSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const id = String(formData.get("id") || "").trim() || null;
+  const title = String(formData.get("title") || "").trim();
+  const timeframe = String(formData.get("timeframe") || "") as GoalTimeframe;
+  if (!title || !timeframe) return;
+
+  const description = String(formData.get("description") || "").trim() || null;
+  const deadline = String(formData.get("deadline") || "").trim() || null;
+  const priority = String(formData.get("priority") || "medium");
+  const status = String(formData.get("status") || "not_started");
+  const progress = Number(formData.get("progress") ?? 0);
+  const parentId = String(formData.get("parentId") || "").trim() || null;
+
+  if (id) {
+    await supabase
+      .from("goals")
+      .update({
+        title,
+        description,
+        timeframe,
+        deadline,
+        priority,
+        status,
+        progress,
+        parent_id: parentId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+  } else {
+    const { data: existing } = await supabase
+      .from("goals")
+      .select("sort_order")
+      .eq("timeframe", timeframe)
+      .order("sort_order", { ascending: false })
+      .limit(1);
+    const nextSortOrder = ((existing?.[0]?.sort_order as number | undefined) ?? -1) + 1;
+
+    await supabase.from("goals").insert({
+      user_id: user.id,
+      title,
+      description,
+      timeframe,
+      deadline,
+      priority,
+      status,
+      progress,
+      parent_id: parentId,
+      sort_order: nextSortOrder,
+    });
+  }
+
+  revalidatePath("/vision");
+}
+
 export async function updateGoalStatus(id: string, status: "not_started" | "in_progress" | "completed" | "on_hold") {
   const supabase = requireSupabase();
   await supabase
