@@ -54,16 +54,19 @@ export async function createGoal(formData: FormData) {
     title,
     timeframe,
     sort_order: nextSortOrder,
+    priority: "medium",
+    status: "not_started",
+    progress: 0,
   });
 
   revalidatePath("/vision");
 }
 
-export async function toggleGoal(id: string, done: boolean) {
+export async function updateGoalStatus(id: string, status: "not_started" | "in_progress" | "completed" | "on_hold") {
   const supabase = requireSupabase();
   await supabase
     .from("goals")
-    .update({ done, completed_at: done ? new Date().toISOString() : null })
+    .update({ status, progress: status === "completed" ? 100 : undefined, updated_at: new Date().toISOString() })
     .eq("id", id);
   revalidatePath("/vision");
 }

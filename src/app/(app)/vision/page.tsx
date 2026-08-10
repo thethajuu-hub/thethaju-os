@@ -37,16 +37,10 @@ const VISION_CARDS: {
     placeholder: "Discipline. Honesty. Craft. …",
   },
   {
-    category: "dream_life",
-    title: "Dream Life",
-    description: "What it looks like when it's all working.",
+    category: "dreams_future_vision",
+    title: "Dreams & Future Vision",
+    description: "What it looks like when it's all working, and where this is headed.",
     placeholder: "On an ordinary Tuesday, I…",
-  },
-  {
-    category: "long_term_vision",
-    title: "Long-Term Vision",
-    description: "Where this is all headed, beyond any single goal.",
-    placeholder: "In the long run, I want to have…",
   },
 ];
 
@@ -55,9 +49,10 @@ const GOAL_TABS: { key: GoalTimeframe; label: string }[] = [
   { key: "5yr", label: "5 Year" },
   { key: "3yr", label: "3 Year" },
   { key: "1yr", label: "1 Year" },
-  { key: "quarter", label: "Quarter" },
-  { key: "month", label: "Month" },
-  { key: "week", label: "Week" },
+  { key: "yearly", label: "Yearly" },
+  { key: "quarterly", label: "Quarterly" },
+  { key: "monthly", label: "Monthly" },
+  { key: "weekly", label: "Weekly" },
 ];
 
 export default async function VisionPage() {

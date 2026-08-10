@@ -6,11 +6,11 @@ import { Check, Plus, X, ChevronUp, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { createGoal, toggleGoal, deleteGoal, moveGoal } from "@/app/(app)/vision/actions";
+import { createGoal, updateGoalStatus, deleteGoal, moveGoal } from "@/app/(app)/vision/actions";
 import type { Goal, GoalTimeframe } from "@/types";
 
 export function GoalList({ timeframe, goals }: { timeframe: GoalTimeframe; goals: Goal[] }) {
-  const doneCount = goals.filter((g) => g.done).length;
+  const doneCount = goals.filter((g) => g.status === "completed").length;
 
   return (
     <div className="flex flex-col gap-3">
@@ -93,23 +93,27 @@ function GoalRow({
       )}
     >
       <button
-        onClick={() => startTransition(() => toggleGoal(goal.id, !goal.done))}
+        onClick={() =>
+          startTransition(() =>
+            updateGoalStatus(goal.id, goal.status === "completed" ? "not_started" : "completed")
+          )
+        }
         className="flex items-center gap-2.5 rounded-md px-1.5 py-1.5 text-left"
       >
         <span
           className={cn(
             "flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded-[5px] border transition-colors",
-            goal.done ? "border-accent bg-accent" : "border-border-strong"
+            goal.status === "completed" ? "border-accent bg-accent" : "border-border-strong"
           )}
         >
-          {goal.done && <Check className="h-3 w-3 text-accent-foreground" strokeWidth={3} />}
+          {goal.status === "completed" && <Check className="h-3 w-3 text-accent-foreground" strokeWidth={3} />}
         </span>
       </button>
 
       <span
         className={cn(
           "min-w-0 flex-1 truncate text-[13px]",
-          goal.done ? "text-foreground-subtle line-through" : "text-foreground"
+          goal.status === "completed" ? "text-foreground-subtle line-through" : "text-foreground"
         )}
       >
         {goal.title}

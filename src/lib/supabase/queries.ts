@@ -142,8 +142,7 @@ const VISION_CATEGORIES: VisionCategory[] = [
   "life_vision",
   "mission",
   "core_values",
-  "dream_life",
-  "long_term_vision",
+  "dreams_future_vision",
 ];
 
 export async function getVisionEntries(
@@ -171,31 +170,53 @@ export async function getVisionEntries(
 
 interface GoalRow {
   id: string;
+  parent_id: string | null;
   title: string;
+  description: string | null;
   timeframe: GoalTimeframe;
-  done: boolean;
+  deadline: string | null;
+  priority: Goal["priority"];
+  status: Goal["status"];
+  progress: number;
   sort_order: number;
   created_at: string;
+  updated_at: string;
 }
 
 function mapGoal(row: GoalRow): Goal {
   return {
     id: row.id,
+    parentId: row.parent_id,
     title: row.title,
+    description: row.description,
     timeframe: row.timeframe,
-    done: row.done,
+    deadline: row.deadline,
+    priority: row.priority,
+    status: row.status,
+    progress: row.progress,
     sortOrder: row.sort_order,
     createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }
 
-const GOAL_TIMEFRAMES: GoalTimeframe[] = ["10yr", "5yr", "3yr", "1yr", "quarter", "month", "week"];
+const GOAL_TIMEFRAMES: GoalTimeframe[] = [
+  "10yr",
+  "5yr",
+  "3yr",
+  "1yr",
+  "yearly",
+  "quarterly",
+  "monthly",
+  "weekly",
+];
 
 export async function getAllGoals(supabase: SupabaseClient): Promise<Record<GoalTimeframe, Goal[]>> {
   const { data, error } = await supabase
     .from("goals")
-    .select("id, title, timeframe, done, sort_order, created_at")
-    .order("done", { ascending: true })
+    .select(
+      "id, parent_id, title, description, timeframe, deadline, priority, status, progress, sort_order, created_at, updated_at"
+    )
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
 
