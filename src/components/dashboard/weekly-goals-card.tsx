@@ -36,7 +36,7 @@ export function WeeklyGoalsCard({ goals }: { goals: Goal[] }) {
             {goals.map((goal) => (
               <div
                 key={goal.id}
-                className="flex flex-col gap-2 rounded-md border border-border p-3"
+                className="flex flex-col gap-2 rounded-xl border border-border p-3"
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="truncate text-[13px] font-medium text-foreground">{goal.title}</span>

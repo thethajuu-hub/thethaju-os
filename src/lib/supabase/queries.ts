@@ -8,6 +8,8 @@ import type {
   VisionCategory,
   VisionEntry,
   GoalTimeframe,
+  GoalPriority,
+  GoalStatus,
   Goal,
 } from "@/types";
 
@@ -138,12 +140,7 @@ export async function getRevenueBySourceThisMonth(supabase: SupabaseClient): Pro
 // VISION & GOALS — Stage 3
 // ============================================================
 
-const VISION_CATEGORIES: VisionCategory[] = [
-  "life_vision",
-  "mission",
-  "core_values",
-  "dreams_future_vision",
-];
+const VISION_CATEGORIES: VisionCategory[] = ["life_vision", "mission", "core_values", "dreams_future_vision"];
 
 export async function getVisionEntries(
   supabase: SupabaseClient
@@ -175,13 +172,16 @@ interface GoalRow {
   description: string | null;
   timeframe: GoalTimeframe;
   deadline: string | null;
-  priority: Goal["priority"];
-  status: Goal["status"];
+  priority: GoalPriority;
+  status: GoalStatus;
   progress: number;
   sort_order: number;
   created_at: string;
   updated_at: string;
 }
+
+const GOAL_COLUMNS =
+  "id, parent_id, title, description, timeframe, deadline, priority, status, progress, sort_order, created_at, updated_at";
 
 function mapGoal(row: GoalRow): Goal {
   return {
@@ -211,12 +211,11 @@ const GOAL_TIMEFRAMES: GoalTimeframe[] = [
   "weekly",
 ];
 
+/** All goals, grouped by timeframe — powers the tabbed ladder on /vision. */
 export async function getAllGoals(supabase: SupabaseClient): Promise<Record<GoalTimeframe, Goal[]>> {
   const { data, error } = await supabase
     .from("goals")
-    .select(
-      "id, parent_id, title, description, timeframe, deadline, priority, status, progress, sort_order, created_at, updated_at"
-    )
+    .select(GOAL_COLUMNS)
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
 
@@ -233,3 +232,35 @@ export async function getAllGoals(supabase: SupabaseClient): Promise<Record<Goal
   }
   return empty;
 }
+
+/** Flat, unsorted-by-timeframe list — used to populate the parent-goal picker. */
+export async function getAllGoalsFlat(supabase: SupabaseClient): Promise<Goal[]> {
+  const { data, error } = await supabase
+    .from("goals")
+    .select(GOAL_COLUMNS)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("getAllGoalsFlat failed:", error.message);
+    return [];
+  }
+  return (data ?? []).map((row) => mapGoal(row as GoalRow));
+}
+
+/** This week's goals — surfaced on Command Center as a preview of Vision's weekly ladder. */
+export async function getWeeklyGoals(supabase: SupabaseClient): Promise<Goal[]> {
+  const { data, error } = await supabase
+    .from("goals")
+    .select(GOAL_COLUMNS)
+    .eq("timeframe", "weekly")
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true })
+    .limit(6);
+
+  if (error) {
+    console.error("getWeeklyGoals failed:", error.message);
+    return [];
+  }
+  return (data ?? []).map((row) => mapGoal(row as GoalRow));
+}
+

@@ -55,8 +55,16 @@ export interface VisionEntry {
   updatedAt: string | null;
 }
 
-/** Mirrors public.goals — see supabase/migrations/0003_vision_goals_upgrade.sql */
-export type GoalTimeframe = "10yr" | "5yr" | "3yr" | "1yr" | "yearly" | "quarterly" | "monthly" | "weekly";
+export type GoalTimeframe =
+  | "10yr"
+  | "5yr"
+  | "3yr"
+  | "1yr"
+  | "yearly"
+  | "quarterly"
+  | "monthly"
+  | "weekly";
+
 export type GoalPriority = "low" | "medium" | "high";
 export type GoalStatus = "not_started" | "in_progress" | "completed" | "on_hold";
 
@@ -73,4 +81,80 @@ export interface Goal {
   sortOrder: number;
   createdAt: string;
   updatedAt: string;
+}
+
+// ============================================================
+// LIFE — Stage 4
+// ============================================================
+
+export type LifeEventCategory = "event" | "appointment" | "reminder";
+
+export interface LifeEvent {
+  id: string;
+  title: string;
+  description: string | null;
+  category: LifeEventCategory;
+  eventDate: string;
+  eventTime: string | null;
+  createdAt: string;
+}
+
+export interface Habit {
+  id: string;
+  name: string;
+  archived: boolean;
+  sortOrder: number;
+  createdAt: string;
+  /** Computed server-side, not a DB column. */
+  currentStreak: number;
+  /** Whether today already has a log entry. */
+  doneToday: boolean;
+}
+
+export interface HealthLog {
+  id: string;
+  logDate: string;
+  sleepHours: number | null;
+  energyLevel: number | null;
+  mood: number | null;
+  waterGlasses: number | null;
+  exerciseMinutes: number | null;
+  notes: string | null;
+  createdAt: string;
+}
+
+export type RelationshipType = "family" | "friend" | "mentor" | "colleague" | "other";
+
+export interface Relationship {
+  id: string;
+  name: string;
+  relationshipType: RelationshipType;
+  lastContactDate: string | null;
+  followUpDate: string | null;
+  notes: string | null;
+  createdAt: string;
+}
+
+export type TripStatus = "bucket_list" | "planned" | "completed";
+
+export interface Trip {
+  id: string;
+  destination: string;
+  status: TripStatus;
+  startDate: string | null;
+  endDate: string | null;
+  notes: string | null;
+  createdAt: string;
+}
+
+export type LifeDocumentCategory = "resume" | "contract" | "certificate" | "id" | "other";
+
+export interface LifeDocument {
+  id: string;
+  title: string;
+  category: LifeDocumentCategory;
+  referenceUrl: string | null;
+  expiryDate: string | null;
+  notes: string | null;
+  createdAt: string;
 }

@@ -12,7 +12,6 @@ export default function VisionLoading() {
         <Skeleton className="h-48 w-full rounded-lg" />
         <Skeleton className="h-48 w-full rounded-lg" />
         <Skeleton className="h-48 w-full rounded-lg" />
-        <Skeleton className="h-48 w-full rounded-lg" />
       </div>
       <Skeleton className="h-72 w-full rounded-lg" />
     </div>

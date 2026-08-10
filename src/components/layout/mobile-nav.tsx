@@ -40,7 +40,7 @@ export function MobileNav() {
       <DialogContent className="left-0 top-0 h-full w-[288px] max-w-[85vw] translate-x-0 translate-y-0 rounded-none rounded-r-lg bg-sidebar-bg p-0 data-[state=open]:animate-fade-in-up">
         <DialogTitle className="sr-only">Navigation</DialogTitle>
         <div className="flex h-14 items-center gap-2.5 border-b border-border px-4">
-          <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-accent text-[11.5px] font-semibold text-accent-foreground">
+          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground text-[11.5px] font-semibold text-bg">
             T
           </div>
           <span className="text-[12.5px] font-medium text-foreground">Founder OS</span>
@@ -69,7 +69,7 @@ export function MobileNav() {
           <div className="border-t border-border pt-3">
             <Link
               href={SETTINGS_ITEM.href}
-              className="flex items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-[13px] text-foreground-muted"
+              className="flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-[13px] text-foreground-muted"
             >
               <SETTINGS_ITEM.icon className="h-[15px] w-[15px] text-foreground-subtle" strokeWidth={1.75} />
               {SETTINGS_ITEM.label}
@@ -101,7 +101,7 @@ function MobileNavNode({
       <Link
         href={item.href}
         className={cn(
-          "flex items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-[13px]",
+          "flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-[13px]",
           pathname.startsWith(item.href)
             ? "bg-surface-hover font-medium text-foreground"
             : "text-foreground-muted"
@@ -117,7 +117,7 @@ function MobileNavNode({
     <div>
       <div
         className={cn(
-          "flex items-center rounded-xl pr-1",
+          "flex items-center rounded-md pr-1",
           (selfActive || descendantActive) && "bg-surface-hover"
         )}
       >
@@ -146,7 +146,7 @@ function MobileNavNode({
               key={child.href}
               href={child.href}
               className={cn(
-                "flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[12.5px]",
+                "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[12.5px]",
                 pathname.startsWith(child.href)
                   ? "bg-surface-hover font-medium text-foreground"
                   : "text-foreground-muted"

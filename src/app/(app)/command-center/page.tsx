@@ -5,12 +5,14 @@ import {
   getRevenueTargets,
   getRevenueAchieved,
   getRevenueBySourceThisMonth,
+  getWeeklyGoals,
 } from "@/lib/supabase/queries";
 import { greetingForHour } from "@/lib/dates";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { MissionControl } from "@/components/dashboard/mission-control";
 import { YearProgress } from "@/components/dashboard/year-progress";
 import { PriorityList } from "@/components/dashboard/priority-list";
+import { WeeklyGoalsCard } from "@/components/dashboard/weekly-goals-card";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { EmptyState } from "@/components/ui/empty-state";
 
@@ -62,6 +64,8 @@ export default async function CommandCenterPage() {
         <PriorityList title="This month" timeframe="month" tasks={data?.tasks.month ?? []} />
       </div>
 
+      <WeeklyGoalsCard goals={data?.weeklyGoals ?? []} />
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Learning streak" value="0 days" icon={Flame} hint="starts today" />
         <StatCard label="Courses in progress" value="0" icon={GraduationCap} />
@@ -83,11 +87,12 @@ export default async function CommandCenterPage() {
 
 async function loadCommandCenterData() {
   const supabase = createClient();
-  const [tasks, targets, achieved, bySource] = await Promise.all([
+  const [tasks, targets, achieved, bySource, weeklyGoals] = await Promise.all([
     getAllTasks(supabase),
     getRevenueTargets(supabase),
     getRevenueAchieved(supabase),
     getRevenueBySourceThisMonth(supabase),
+    getWeeklyGoals(supabase),
   ]);
-  return { tasks, targets, achieved, bySource };
+  return { tasks, targets, achieved, bySource, weeklyGoals };
 }

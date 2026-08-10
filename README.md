@@ -46,17 +46,26 @@ Command Center's tasks and Mission Control are backed by real Supabase tables. R
 
 This creates three tables — `tasks`, `revenue_targets`, `revenue_entries` — all with row-level security scoped to your own user. `revenue_entries` has a `source` column (`agency` / `dropshipping` / `other`) on purpose: when the Agency and Dropshipping modules ship in a later phase, they'll insert into this same table and Mission Control's totals update automatically — no changes needed there.
 
-### 3. Run the Stage 3 migration (Vision & Goals)
+### 3. Run the Stage 3 migrations (Vision & Goals)
 
-Same process, next file:
+Two files, run in order — the second upgrades the first to the full schema, and is safe to run even if you haven't run the first one yet:
 
 1. Supabase → **SQL Editor → New query**
-2. Paste the full contents of `supabase/migrations/0002_vision.sql`
-3. Run it
+2. Paste and run `supabase/migrations/0002_vision.sql`
+3. New query again — paste and run `supabase/migrations/0003_vision_goals_upgrade.sql`
 
-Adds `vision_entries` (your five vision statements — Life Vision, Mission, Core Values, Dream Life, Long-Term Vision) and `goals` (the ladder from 10-year down to this week). "Today" already lives in Tasks and "this year" in Mission Control's revenue target, so Goals only covers the rungs in between — no duplication.
+This gives you `vision_entries` (4 statements — Life Vision, Founder Mission, Core Values, Dreams/Future Vision) and a full `goals` table: title, description, time period (10-Year down to Weekly), deadline, priority, status, progress, and an optional parent goal for building a hierarchy. "Today" already lives in Tasks and "this year" in Mission Control's revenue target, so Goals only covers the rungs in between — no duplication. Weekly goals also surface as a read-only preview on Command Center.
 
-### 4. Run it locally
+### 4. Run the Stage 4 migration (Life)
+
+Same process, one more file:
+
+1. Supabase → **SQL Editor → New query**
+2. Paste and run `supabase/migrations/0004_life.sql`
+
+Creates six tables covering all of Life: `life_events` (Planner), `habits` + `habit_logs` (streak tracking), `health_logs` (daily sleep/energy/mood/water/exercise), `relationships`, `trips`, and `life_documents`. All RLS-scoped to your account, independent of the other migrations.
+
+### 5. Run it locally
 
 ```bash
 npm run dev
@@ -64,7 +73,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) — you'll land on `/command-center` (or `/login` if Supabase is configured and you're signed out).
 
-### 5. Verify before you ship
+### 6. Verify before you ship
 
 ```bash
 npm run typecheck   # tsc --noEmit

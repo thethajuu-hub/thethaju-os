@@ -1,12 +1,13 @@
 import { AlertTriangle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getVisionEntries, getAllGoals } from "@/lib/supabase/queries";
+import { getVisionEntries, getAllGoals, getAllGoalsFlat } from "@/lib/supabase/queries";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { VisionStatementCard } from "@/components/dashboard/vision-statement-card";
 import { GoalList } from "@/components/dashboard/goal-list";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import type { VisionCategory, GoalTimeframe } from "@/types";
+import { TIMEFRAME_LABELS, TIMEFRAME_ORDER } from "@/lib/goal-labels";
+import type { VisionCategory } from "@/types";
 
 function isSupabaseConfigured() {
   return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
@@ -38,26 +39,16 @@ const VISION_CARDS: {
   },
   {
     category: "dreams_future_vision",
-    title: "Dreams & Future Vision",
-    description: "What it looks like when it's all working, and where this is headed.",
-    placeholder: "On an ordinary Tuesday, I…",
+    title: "Dreams / Future Vision",
+    description: "What it looks like when it's all working, and where it's all headed.",
+    placeholder: "On an ordinary Tuesday, years from now, I…",
   },
-];
-
-const GOAL_TABS: { key: GoalTimeframe; label: string }[] = [
-  { key: "10yr", label: "10 Year" },
-  { key: "5yr", label: "5 Year" },
-  { key: "3yr", label: "3 Year" },
-  { key: "1yr", label: "1 Year" },
-  { key: "yearly", label: "Yearly" },
-  { key: "quarterly", label: "Quarterly" },
-  { key: "monthly", label: "Monthly" },
-  { key: "weekly", label: "Weekly" },
 ];
 
 export default async function VisionPage() {
   const configured = isSupabaseConfigured();
   const data = configured ? await loadVisionData() : null;
+  const allGoalsFlat = data?.allGoalsFlat ?? [];
 
   return (
     <div className="flex flex-col gap-8 animate-fade-in">
@@ -98,21 +89,21 @@ export default async function VisionPage() {
           <CardTitle>Goal ladder</CardTitle>
           <CardDescription>
             10-year down to this week — each rung a step toward the last. Today&rsquo;s tasks live on
-            Command Center; this year&rsquo;s revenue target lives in Mission Control.
+            Command Center; weekly goals appear there too, as a preview.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="10yr">
             <TabsList className="h-auto flex-wrap">
-              {GOAL_TABS.map((tab) => (
-                <TabsTrigger key={tab.key} value={tab.key}>
-                  {tab.label}
+              {TIMEFRAME_ORDER.map((tf) => (
+                <TabsTrigger key={tf} value={tf}>
+                  {TIMEFRAME_LABELS[tf]}
                 </TabsTrigger>
               ))}
             </TabsList>
-            {GOAL_TABS.map((tab) => (
-              <TabsContent key={tab.key} value={tab.key}>
-                <GoalList timeframe={tab.key} goals={data?.goals[tab.key] ?? []} />
+            {TIMEFRAME_ORDER.map((tf) => (
+              <TabsContent key={tf} value={tf}>
+                <GoalList timeframe={tf} goals={data?.goals[tf] ?? []} allGoals={allGoalsFlat} />
               </TabsContent>
             ))}
           </Tabs>
@@ -124,6 +115,10 @@ export default async function VisionPage() {
 
 async function loadVisionData() {
   const supabase = createClient();
-  const [vision, goals] = await Promise.all([getVisionEntries(supabase), getAllGoals(supabase)]);
-  return { vision, goals };
+  const [vision, goals, allGoalsFlat] = await Promise.all([
+    getVisionEntries(supabase),
+    getAllGoals(supabase),
+    getAllGoalsFlat(supabase),
+  ]);
+  return { vision, goals, allGoalsFlat };
 }

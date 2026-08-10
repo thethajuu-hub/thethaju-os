@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import type { GoalTimeframe, VisionCategory } from "@/types";
+import type { GoalTimeframe, GoalPriority, GoalStatus, VisionCategory } from "@/types";
 
 function requireSupabase() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -30,38 +30,10 @@ export async function saveVisionEntry(category: VisionCategory, content: string)
   revalidatePath("/vision");
 }
 
-export async function createGoal(formData: FormData) {
-  const supabase = requireSupabase();
-  const title = String(formData.get("title") || "").trim();
-  const timeframe = String(formData.get("timeframe") || "") as GoalTimeframe;
-  if (!title || !timeframe) return;
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return;
-
-  const { data: existing } = await supabase
-    .from("goals")
-    .select("sort_order")
-    .eq("timeframe", timeframe)
-    .order("sort_order", { ascending: false })
-    .limit(1);
-  const nextSortOrder = ((existing?.[0]?.sort_order as number | undefined) ?? -1) + 1;
-
-  await supabase.from("goals").insert({
-    user_id: user.id,
-    title,
-    timeframe,
-    sort_order: nextSortOrder,
-    priority: "medium",
-    status: "not_started",
-    progress: 0,
-  });
-
-  revalidatePath("/vision");
-}
-
+/**
+ * Create or update a goal — a single form powers both the "Add goal" and
+ * "Edit goal" dialogs. Presence of a non-empty `id` field decides which.
+ */
 export async function saveGoal(formData: FormData) {
   const supabase = requireSupabase();
   const {
@@ -76,10 +48,13 @@ export async function saveGoal(formData: FormData) {
 
   const description = String(formData.get("description") || "").trim() || null;
   const deadline = String(formData.get("deadline") || "").trim() || null;
-  const priority = String(formData.get("priority") || "medium");
-  const status = String(formData.get("status") || "not_started");
-  const progress = Number(formData.get("progress") ?? 0);
-  const parentId = String(formData.get("parentId") || "").trim() || null;
+  const priority = String(formData.get("priority") || "medium") as GoalPriority;
+  const status = String(formData.get("status") || "not_started") as GoalStatus;
+  const progressRaw = Number(formData.get("progress") || 0);
+  const progress = Math.min(100, Math.max(0, Number.isFinite(progressRaw) ? progressRaw : 0));
+  const parentIdRaw = String(formData.get("parentId") || "").trim();
+  // A goal can't be its own parent.
+  const parentId = parentIdRaw && parentIdRaw !== id ? parentIdRaw : null;
 
   if (id) {
     await supabase
@@ -120,44 +95,12 @@ export async function saveGoal(formData: FormData) {
   }
 
   revalidatePath("/vision");
-}
-
-export async function updateGoalStatus(id: string, status: "not_started" | "in_progress" | "completed" | "on_hold") {
-  const supabase = requireSupabase();
-  await supabase
-    .from("goals")
-    .update({ status, progress: status === "completed" ? 100 : undefined, updated_at: new Date().toISOString() })
-    .eq("id", id);
-  revalidatePath("/vision");
+  revalidatePath("/command-center");
 }
 
 export async function deleteGoal(id: string) {
   const supabase = requireSupabase();
   await supabase.from("goals").delete().eq("id", id);
   revalidatePath("/vision");
-}
-
-export async function moveGoal(timeframe: GoalTimeframe, id: string, direction: "up" | "down") {
-  const supabase = requireSupabase();
-
-  const { data: rows } = await supabase
-    .from("goals")
-    .select("id, sort_order")
-    .eq("timeframe", timeframe)
-    .order("sort_order", { ascending: true });
-
-  if (!rows) return;
-  const index = rows.findIndex((r) => r.id === id);
-  const swapIndex = direction === "up" ? index - 1 : index + 1;
-  if (index === -1 || swapIndex < 0 || swapIndex >= rows.length) return;
-
-  const a = rows[index];
-  const b = rows[swapIndex];
-
-  await Promise.all([
-    supabase.from("goals").update({ sort_order: b.sort_order }).eq("id", a.id),
-    supabase.from("goals").update({ sort_order: a.sort_order }).eq("id", b.id),
-  ]);
-
-  revalidatePath("/vision");
+  revalidatePath("/command-center");
 }
